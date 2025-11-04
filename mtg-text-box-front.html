@@ -1,0 +1,100 @@
+<div class="card-container">
+    <img class="card-image">
+    <div style="display: none;">{{Front}}</div> 
+    <canvas id="rules" class="occlusion"></canvas>
+</div>
+
+<script>
+var url = 'https://api.scryfall.com/cards/'+ "{{UUID}}" + '?format=json';
+
+
+fetch(url)
+    .then(response => response.json())
+    .then(data => {
+          createCard(data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+
+function createCard(data) {
+    setCardImage(data);
+    setOcclusions(data);
+}
+
+function setCardImage(data) {
+    document.querySelector('.card-image').src = data.image_uris.normal;
+}
+
+function setOcclusions(data) {
+    const canvases = getCanvases();
+    const canvasContexts = getCanvasContexts(canvases);
+
+    setColor(canvases, canvasContexts, data.color_identity);
+    setRulesOcclusion(canvasContexts.rules);
+}
+
+function setColor(canvases, contexts, color_identity) {
+    const backgroundColor = getBackgroundColor(color_identity);
+    
+    for (let key in contexts) {
+        if (canvases.hasOwnProperty(key) && contexts[key]) {
+            contexts[key].fillStyle = backgroundColor;
+        }
+    }
+}
+
+function setRulesOcclusion(context) {
+    if (context) {
+        context.fillRect(24, 95, 250, 43);
+    }
+}
+
+function getCanvases() {
+    return {
+        "rules": document.getElementById('rules')
+    }
+}
+
+function getCanvasContexts(canvases) {
+    return {
+        "rules": canvases.rules ? canvases.rules.getContext('2d') : ''
+    }
+}
+
+function getBackgroundColor(colors) {
+    console.log(colors);
+    if (colors.length <= 1) {
+        return getMtgColor(colors[0]);
+    } else {
+        // For 3+ colors, you might want to return a specific multi-color background
+        return 'rgb(218, 165, 32)'; // Gold color for multi-color cards
+    }
+}
+
+function getMtgColor(color_identity) {
+    let background_color;
+    
+    switch (color_identity) {
+        case 'W':
+            background_color = 'rgb(248, 231, 185)'; // Light yellow
+            break;
+        case 'U':
+            background_color = 'rgb(179, 206, 234)'; // Light blue
+            break;
+        case 'B':
+            background_color = 'rgb(166, 159, 157)'; // Dark gray
+            break;
+        case 'R':
+            background_color = 'rgb(235, 159, 130)'; // Light red
+            break;
+        case 'G':
+            background_color = 'rgb(166, 211, 182)'; // Light green
+            break;
+        default:
+            background_color = 'rgb(201, 194, 186)'; // Light brown (for colorless/artifacts)
+    }
+    
+    return background_color;
+}
+</script>
