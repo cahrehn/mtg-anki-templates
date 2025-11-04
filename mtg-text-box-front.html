@@ -30,27 +30,55 @@ function setOcclusions(data) {
     const canvases = getCanvases();
     const canvasContexts = getCanvasContexts(canvases);
 
-    setColor(canvases, canvasContexts, data.color_identity);
-    setRulesOcclusion(canvasContexts.rules, data);
+    setColor(canvases, canvasContexts, data);
+    setRulesOcclusion(canvasContexts.rules, data.layout);
 }
 
-function setColor(canvases, contexts, color_identity) {
-    const backgroundColor = getBackgroundColor(color_identity);
-    
+function sortColorsByWUBRG(colors) {
+    const wubrgOrder = ['W', 'U', 'B', 'R', 'G'];
+    return colors.slice().sort((a, b) => {
+        return wubrgOrder.indexOf(a) - wubrgOrder.indexOf(b);
+    });
+}
+
+function getOcclusionRectangle(layout) {
+    if (layout === "saga") {
+        return { x: 14, y: 17, width: 134, height: 109 };
+    } else {
+        return { x: 24, y: 95, width: 250, height: 43 };
+    }
+}
+
+function getFillStyle(context, data) {
+    const rect = getOcclusionRectangle(data.layout);
+
+    if (data.layout !== "saga" && data.color_identity.length === 2) {
+        const sortedColors = sortColorsByWUBRG(data.color_identity);
+        const gradient = context.createLinearGradient(rect.x, 0, rect.x + rect.width, 0);
+        gradient.addColorStop(0, getMtgColor(sortedColors[0]));
+        gradient.addColorStop(0.45, getMtgColor(sortedColors[0]));
+        gradient.addColorStop(0.55, getMtgColor(sortedColors[1]));
+        gradient.addColorStop(1, getMtgColor(sortedColors[1]));
+
+        return gradient;
+    } else {
+        return getBackgroundColor(data.color_identity);
+    }
+}
+
+function setColor(canvases, contexts, data) {
     for (let key in contexts) {
         if (canvases.hasOwnProperty(key) && contexts[key]) {
-            contexts[key].fillStyle = backgroundColor;
+            const context = contexts[key];
+            context.fillStyle = getFillStyle(context, data);
         }
     }
 }
 
-function setRulesOcclusion(context, data) {
+function setRulesOcclusion(context, layout) {
     if (context) {
-        if (data.layout === "saga") {
-            context.fillRect(14, 17, 134, 109);
-        } else {
-            context.fillRect(24, 95, 250, 43);
-        }
+        const rect = getOcclusionRectangle(layout);
+        context.fillRect(rect.x, rect.y, rect.width, rect.height);
     }
 }
 
@@ -71,8 +99,7 @@ function getBackgroundColor(colors) {
     if (colors.length <= 1) {
         return getMtgColor(colors[0]);
     } else {
-        // For 3+ colors, you might want to return a specific multi-color background
-        return 'rgb(218, 165, 32)'; // Gold color for multi-color cards
+        return 'rgb(218, 165, 32)';
     }
 }
 
