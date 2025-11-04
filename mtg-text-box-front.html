@@ -31,7 +31,7 @@ function setOcclusions(data) {
     const canvasContexts = getCanvasContexts(canvases);
 
     setColor(canvases, canvasContexts, data.color_identity);
-    setRulesOcclusion(canvasContexts.rules);
+    setRulesOcclusion(canvasContexts.rules, data);
 }
 
 function setColor(canvases, contexts, color_identity) {
@@ -44,9 +44,13 @@ function setColor(canvases, contexts, color_identity) {
     }
 }
 
-function setRulesOcclusion(context) {
+function setRulesOcclusion(context, data) {
     if (context) {
-        context.fillRect(24, 95, 250, 43);
+        if (data.layout === "saga") {
+            context.fillRect(14, 17, 134, 109);
+        } else {
+            context.fillRect(24, 95, 250, 43);
+        }
     }
 }
 
