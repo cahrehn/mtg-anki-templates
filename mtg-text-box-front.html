@@ -30,16 +30,52 @@ function setOcclusions(data) {
     const canvases = getCanvases();
     const canvasContexts = getCanvasContexts(canvases);
 
-    setColor(canvases, canvasContexts, data.color_identity);
+    setColor(canvases, canvasContexts, data.color_identity, data.layout);
     setRulesOcclusion(canvasContexts.rules, data);
 }
 
-function setColor(canvases, contexts, color_identity) {
-    const backgroundColor = getBackgroundColor(color_identity);
-    
+function sortColorsByWUBRG(colors) {
+    const wubrgOrder = ['W', 'U', 'B', 'R', 'G'];
+    return colors.slice().sort((a, b) => {
+        return wubrgOrder.indexOf(a) - wubrgOrder.indexOf(b);
+    });
+}
+
+function setColor(canvases, contexts, color_identity, layout) {
+    // Get rectangle dimensions based on layout
+    let rectX, rectWidth;
+    if (layout === "saga") {
+        rectX = 14;
+        rectWidth = 134;
+    } else {
+        rectX = 24;
+        rectWidth = 250;
+    }
+
     for (let key in contexts) {
         if (canvases.hasOwnProperty(key) && contexts[key]) {
-            contexts[key].fillStyle = backgroundColor;
+            const context = contexts[key];
+
+            // Check if this is a two-color card
+            if (color_identity.length === 2) {
+                // Sort colors by WUBRG order
+                const sortedColors = sortColorsByWUBRG(color_identity);
+
+                // Create horizontal gradient
+                const gradient = context.createLinearGradient(rectX, 0, rectX + rectWidth, 0);
+
+                // Add color stops: left color -> gradient in middle -> right color
+                gradient.addColorStop(0, getMtgColor(sortedColors[0]));
+                gradient.addColorStop(0.45, getMtgColor(sortedColors[0]));
+                gradient.addColorStop(0.55, getMtgColor(sortedColors[1]));
+                gradient.addColorStop(1, getMtgColor(sortedColors[1]));
+
+                context.fillStyle = gradient;
+            } else {
+                // Single color or 3+ colors
+                const backgroundColor = getBackgroundColor(color_identity);
+                context.fillStyle = backgroundColor;
+            }
         }
     }
 }
