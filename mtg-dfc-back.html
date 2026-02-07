@@ -1,0 +1,29 @@
+<div class="dfc-container">
+    <div class="card-container front-face">
+        <img class="card-image front-image">
+        <div style="display: none;">{{cloze:Text}}</div>
+    </div>
+    <div class="card-container back-face">
+        <img class="card-image back-image">
+    </div>
+</div>
+
+<script>
+var url = 'https://api.scryfall.com/cards/' + "{{UUID}}" + '?format=json';
+
+fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        setCardImages(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
+function setCardImages(data) {
+    if (data.card_faces && data.card_faces.length >= 2) {
+        document.querySelector('.front-image').src = data.card_faces[0].image_uris.normal;
+        document.querySelector('.back-image').src = data.card_faces[1].image_uris.normal;
+    }
+}
+</script>
