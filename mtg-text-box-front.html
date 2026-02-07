@@ -34,11 +34,31 @@ function setOcclusions(data) {
     setRulesOcclusion(canvasContexts.rules, data.layout);
 }
 
-function sortColorsByWUBRG(colors) {
-    const wubrgOrder = ['W', 'U', 'B', 'R', 'G'];
-    return colors.slice().sort((a, b) => {
-        return wubrgOrder.indexOf(a) - wubrgOrder.indexOf(b);
-    });
+function sortColorsByGuildOrder(colors) {
+    // Official guild order for two-color pairs
+    const guildOrder = [
+        'WU', 'WB', 'RW', 'GW',  // Allied with W
+        'UB', 'UR', 'GU',        // Allied with U (excluding W)
+        'BR', 'BG',              // Allied with B (excluding W, U)
+        'RG'                     // Allied with R (excluding W, U, B)
+    ];
+
+    if (colors.length !== 2) {
+        return colors;
+    }
+
+    // Try both orderings and find which matches the guild order
+    const pair1 = colors[0] + colors[1];
+    const pair2 = colors[1] + colors[0];
+
+    if (guildOrder.includes(pair1)) {
+        return [colors[0], colors[1]];
+    } else if (guildOrder.includes(pair2)) {
+        return [colors[1], colors[0]];
+    }
+
+    // Fallback to original order if not found
+    return colors;
 }
 
 function getOcclusionRectangle(layout) {
@@ -53,7 +73,7 @@ function getFillStyle(context, data) {
     const rect = getOcclusionRectangle(data.layout);
 
     if (data.layout !== "saga" && data.color_identity.length === 2) {
-        const sortedColors = sortColorsByWUBRG(data.color_identity);
+        const sortedColors = sortColorsByGuildOrder(data.color_identity);
         const gradient = context.createLinearGradient(rect.x, 0, rect.x + rect.width, 0);
         gradient.addColorStop(0, getMtgColor(sortedColors[0]));
         gradient.addColorStop(0.45, getMtgColor(sortedColors[0]));
