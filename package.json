@@ -1,0 +1,7 @@
+{
+  "name": "mtg-anki-templates",
+  "private": true,
+  "scripts": {
+    "build": "node build.js"
+  }
+}
