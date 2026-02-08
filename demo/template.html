@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTG Anki Templates</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  line-height: 1.6;
+}
+
+header {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: #16213e;
+  border-bottom: 2px solid #0f3460;
+}
+
+header h1 {
+  font-size: 2rem;
+  color: #e94560;
+  margin-bottom: 0.5rem;
+}
+
+header p {
+  color: #a0a0b0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.template-demo {
+  margin-bottom: 3rem;
+  background: #16213e;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #0f3460;
+}
+
+.template-demo h2 {
+  color: #e94560;
+  margin-bottom: 0.25rem;
+}
+
+.template-demo > p {
+  color: #a0a0b0;
+  margin-bottom: 1rem;
+}
+
+.demo-viewer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.demo-viewer .card-iframe {
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 488 / 680;
+  border: none;
+  border-radius: 8px;
+  background: white;
+}
+
+.demo-viewer .dfc-iframe {
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 986 / 680;
+  border: none;
+  border-radius: 8px;
+  background: white;
+}
+
+.demo-viewer .split-iframe {
+  width: 100%;
+  max-width: 680px;
+  aspect-ratio: 680 / 560;
+  border: none;
+  border-radius: 8px;
+  background: white;
+}
+
+.demo-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
+.cloze-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cloze-btn {
+  padding: 0.4rem 1rem;
+  border: 1px solid #0f3460;
+  background: #1a1a2e;
+  color: #a0a0b0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.cloze-btn:hover {
+  border-color: #e94560;
+  color: #e0e0e0;
+}
+
+.cloze-btn.active {
+  background: #e94560;
+  color: white;
+  border-color: #e94560;
+}
+
+.reveal-btn {
+  padding: 0.5rem 1.5rem;
+  background: #0f3460;
+  color: #e0e0e0;
+  border: 1px solid #0f3460;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.reveal-btn:hover {
+  background: #1a4a7a;
+  border-color: #1a4a7a;
+}
+
+.reveal-btn.revealed {
+  background: #e94560;
+  border-color: #e94560;
+  color: white;
+}
+
+footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #606070;
+  font-size: 0.85rem;
+  border-top: 1px solid #0f3460;
+}
+
+footer a {
+  color: #e94560;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+</style>
+<script>
+var demoState = {};
+
+function initSection(id, frontSrcs, backSrc) {
+  demoState[id] = { frontSrcs: frontSrcs, backSrc: backSrc, cloze: 'c1', revealed: false };
+}
+
+function toggleReveal(id, btn) {
+  var state = demoState[id];
+  state.revealed = !state.revealed;
+  var iframe = document.getElementById(id + '-iframe');
+  if (state.revealed) {
+    iframe.src = state.backSrc;
+    btn.textContent = 'Show Question';
+    btn.classList.add('revealed');
+  } else {
+    iframe.src = state.frontSrcs[state.cloze] || state.frontSrcs['default'];
+    btn.textContent = 'Show Answer';
+    btn.classList.remove('revealed');
+  }
+}
+
+function selectCloze(id, cloze, btn) {
+  var state = demoState[id];
+  state.cloze = cloze;
+  state.revealed = false;
+  document.getElementById(id + '-iframe').src = state.frontSrcs[cloze];
+  btn.parentElement.querySelectorAll('.cloze-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  var revealBtn = document.querySelector('#' + id + ' .reveal-btn');
+  revealBtn.textContent = 'Show Answer';
+  revealBtn.classList.remove('revealed');
+}
+</script>
+</head>
+<body>
+
+<header>
+  <h1>MTG Anki Templates</h1>
+  <p>Anki flashcard templates for studying Magic: The Gathering cards. Each template occludes specific card regions, using color-coded overlays matched to the card's color identity.</p>
+</header>
+
+<main>
+{{SECTIONS}}
+</main>
+
+<footer>
+  <p>Card images courtesy of <a href="https://scryfall.com">Scryfall</a>. MTG Anki Templates is unofficial Fan Content permitted under the <a href="https://company.wizards.com/en/legal/fancontentpolicy">Fan Content Policy</a>.</p>
+</footer>
+
+</body>
+</html>

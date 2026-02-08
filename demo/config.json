@@ -1,0 +1,51 @@
+{
+  "sections": [
+    {
+      "id": "text-box",
+      "title": "Text Box Occlusion",
+      "description": "Hides the rules text. Works for creatures, instants, sorceries, and sagas.",
+      "templates": {
+        "front": "mtg-text-box-front.html",
+        "back": "mtg-text-box-back.html"
+      },
+      "data": "demo/data/normal-card.json",
+      "css": "mtg-text-box.css",
+      "cloze": false
+    },
+    {
+      "id": "adventure",
+      "title": "Adventure Cards",
+      "description": "Cloze 1 occludes the adventure text, Cloze 2 occludes the permanent type.",
+      "templates": {
+        "front": "mtg-adventure-front.html"
+      },
+      "data": "demo/data/adventure-card.json",
+      "css": "mtg-adventure.css",
+      "cloze": true
+    },
+    {
+      "id": "dfc",
+      "title": "Double-Faced Cards",
+      "description": "Shows both faces side by side. Cloze 1 occludes the front face, Cloze 2 occludes the back.",
+      "templates": {
+        "front": "mtg-dfc-front.html",
+        "back": "mtg-dfc-back.html"
+      },
+      "data": "demo/data/dfc-card.json",
+      "css": "mtg-dfc.css",
+      "cloze": true
+    },
+    {
+      "id": "split",
+      "title": "Split / Room Cards",
+      "description": "Rotated 90 degrees. Cloze 1 occludes the left half, Cloze 2 occludes the right.",
+      "templates": {
+        "front": "mtg-split-front.html",
+        "back": "mtg-split-back.html"
+      },
+      "data": "demo/data/split-card.json",
+      "css": "mtg-split.css",
+      "cloze": true
+    }
+  ]
+}
