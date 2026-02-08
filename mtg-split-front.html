@@ -1,0 +1,128 @@
+<div class="card-container">
+    <img class="card-image">
+    <div style="display: none;">{{cloze:Text}}</div>
+    {{#c1}}<canvas id="rules-left" class="occlusion"></canvas>{{/c1}}
+    {{#c2}}<canvas id="rules-right" class="occlusion"></canvas>{{/c2}}
+</div>
+
+<script>
+var url = 'https://api.scryfall.com/cards/' + "{{UUID}}" + '?format=json';
+
+fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        createCard(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
+function createCard(data) {
+    setCardImage(data);
+    const img = document.querySelector('.card-image');
+
+    if (img.complete && img.naturalHeight !== 0) {
+        setOcclusions(data);
+    } else {
+        img.onload = () => {
+            setOcclusions(data);
+        };
+    }
+}
+
+function setCardImage(data) {
+    document.querySelector('.card-image').src = data.image_uris.normal;
+}
+
+function setOcclusions(data) {
+    const img = document.querySelector('.card-image');
+    const canvases = getCanvases();
+
+    // Set canvas resolution to match image natural size
+    for (let key in canvases) {
+        if (canvases[key]) {
+            canvases[key].width = img.naturalWidth;
+            canvases[key].height = img.naturalHeight;
+        }
+    }
+
+    const canvasContexts = getCanvasContexts(canvases);
+
+    // Get colors for each half
+    const colors = data.color_identity || [];
+    const leftColor = colors[0] || null;
+    const rightColor = colors[1] || colors[0] || null;
+
+    // Draw left occlusion (Central Elevator — bottom half in portrait)
+    if (canvasContexts.rulesLeft) {
+        const ctx = canvasContexts.rulesLeft;
+        ctx.fillStyle = getMtgColor(leftColor);
+        drawLeftRulesOcclusion(ctx);
+    }
+
+    // Draw right occlusion (Promising Stairs — top half in portrait)
+    if (canvasContexts.rulesRight) {
+        const ctx = canvasContexts.rulesRight;
+        ctx.fillStyle = getMtgColor(rightColor);
+        drawRightRulesOcclusion(ctx);
+    }
+}
+
+// Portrait coordinates for the bottom-half room's rules text
+// (becomes the LEFT side after 90deg clockwise rotation)
+function drawLeftRulesOcclusion(ctx) {
+    const w = ctx.canvas.width;
+    const h = ctx.canvas.height;
+
+    ctx.fillRect(w * 0.71, h * 0.515, w * 0.24, h * 0.385);
+}
+
+// Portrait coordinates for the top-half room's rules text
+// (becomes the RIGHT side after 90deg clockwise rotation)
+function drawRightRulesOcclusion(ctx) {
+    const w = ctx.canvas.width;
+    const h = ctx.canvas.height;
+
+    ctx.fillRect(w * 0.71, h * 0.06, w * 0.24, h * 0.38);
+}
+
+function getCanvases() {
+    return {
+        "rulesLeft": document.getElementById('rules-left'),
+        "rulesRight": document.getElementById('rules-right')
+    }
+}
+
+function getCanvasContexts(canvases) {
+    return {
+        "rulesLeft": canvases.rulesLeft ? canvases.rulesLeft.getContext('2d') : null,
+        "rulesRight": canvases.rulesRight ? canvases.rulesRight.getContext('2d') : null
+    }
+}
+
+function getMtgColor(color_identity) {
+    let background_color;
+
+    switch (color_identity) {
+        case 'W':
+            background_color = 'rgb(248, 231, 185)';
+            break;
+        case 'U':
+            background_color = 'rgb(179, 206, 234)';
+            break;
+        case 'B':
+            background_color = 'rgb(166, 159, 157)';
+            break;
+        case 'R':
+            background_color = 'rgb(235, 159, 130)';
+            break;
+        case 'G':
+            background_color = 'rgb(166, 211, 182)';
+            break;
+        default:
+            background_color = 'rgb(201, 194, 186)';
+    }
+
+    return background_color;
+}
+</script>

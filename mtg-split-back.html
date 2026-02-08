@@ -1,0 +1,21 @@
+<div class="card-container">
+    <img class="card-image">
+    <div style="display: none;">{{cloze:Text}}</div>
+</div>
+
+<script>
+var url = 'https://api.scryfall.com/cards/' + "{{UUID}}" + '?format=json';
+
+fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        setCardImage(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
+function setCardImage(data) {
+    document.querySelector('.card-image').src = data.image_uris.normal;
+}
+</script>
