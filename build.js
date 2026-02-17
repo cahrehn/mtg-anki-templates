@@ -29,8 +29,9 @@ for (const cssFile of cssFiles) {
 
 // Process Anki tags in template HTML
 function processAnkiTags(html, cardData, clozeState) {
-  // Replace {{UUID}} with actual UUID
+  // Replace {{UUID}} with actual UUID and {{SetCode}} with set code
   html = html.replace(/\{\{UUID\}\}/g, cardData.id);
+  html = html.replace(/\{\{SetCode\}\}/g, cardData.code || '');
 
   // Replace {{Front}} and {{cloze:Text}} with card name (these are in hidden divs)
   html = html.replace(/\{\{Front\}\}/g, cardData.name);
@@ -71,7 +72,7 @@ function injectCardData(html, cardData) {
   //   Promise.resolve(__cardData).then(data => {
 
   html = html.replace(
-    /var url = ['"]https:\/\/api\.scryfall\.com\/cards\/['"].*?;\s*\n+\s*fetch\(url\)\s*\n\s*\.then\(response\s*=>\s*response\.json\(\)\)\s*\n\s*\.then\(/g,
+    /var url = ['"]https:\/\/api\.scryfall\.com\/(?:cards|sets)\/['"].*?;\s*\n+\s*fetch\(url\)\s*\n\s*\.then\(response\s*=>\s*response\.json\(\)\)\s*\n\s*\.then\(/g,
     `var __cardData = ${dataJson};\n\nPromise.resolve(__cardData).then(`
   );
 
@@ -127,7 +128,7 @@ function build() {
   for (const section of CONFIG.sections) {
     const cardData = JSON.parse(fs.readFileSync(path.join(ROOT, section.data), 'utf8'));
     const frontFile = section.templates.front;
-    const iframeClass = frontFile.includes('split') ? 'split-iframe' : frontFile.includes('dfc') ? 'dfc-iframe' : 'card-iframe';
+    const iframeClass = frontFile.includes('split') ? 'split-iframe' : frontFile.includes('dfc') ? 'dfc-iframe' : frontFile.includes('symbol') ? 'symbol-iframe' : 'card-iframe';
 
     let sectionContent = '';
     sectionContent += `<section class="template-demo" id="${section.id}">\n`;
