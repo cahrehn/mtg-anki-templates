@@ -1,0 +1,24 @@
+<div class="symbol-container">
+    <div class="symbol-card">
+        <img class="set-icon" alt="Set symbol">
+        <div class="set-name"></div>
+    </div>
+</div>
+
+<script>
+var url = 'https://api.scryfall.com/sets/' + "{{SetCode}}" + '?format=json';
+
+fetch(url)
+    .then(response => response.json())
+    .then(data => {
+          createCard(data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+
+function createCard(data) {
+    document.querySelector('.set-icon').src = data.icon_svg_uri;
+    document.querySelector('.set-name').textContent = data.name;
+}
+</script>

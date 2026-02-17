@@ -1,0 +1,35 @@
+.card {
+    font-family: arial;
+    font-size: 20px;
+    text-align: center;
+    color: black;
+    background-color: white;
+}
+
+.symbol-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
+
+.symbol-card {
+    position: relative;
+}
+
+.set-icon {
+    width: 64px;
+    height: 64px;
+}
+
+.set-name {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80vw;
+    margin-top: 16px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
