@@ -46,6 +46,18 @@
       "data": "demo/data/split-card.json",
       "css": "mtg-split.css",
       "cloze": true
+    },
+    {
+      "id": "symbol",
+      "title": "Set Symbol Recognition",
+      "description": "Shows the set icon SVG. The answer is the set name.",
+      "templates": {
+        "front": "mtg-symbol-front.html",
+        "back": "mtg-symbol-back.html"
+      },
+      "data": "demo/data/set-symbol.json",
+      "css": "mtg-symbol.css",
+      "cloze": false
     }
   ]
 }
