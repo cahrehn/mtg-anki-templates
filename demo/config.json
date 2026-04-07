@@ -48,6 +48,17 @@
       "cloze": true
     },
     {
+      "id": "prepare",
+      "title": "Prepare Cards",
+      "description": "Cloze 1 occludes the permanent name, Cloze 2 occludes the spell name.",
+      "templates": {
+        "front": "mtg-prepare-front.html"
+      },
+      "data": "demo/data/prepare-card.json",
+      "css": "mtg-prepare.css",
+      "cloze": true
+    },
+    {
       "id": "symbol",
       "title": "Set Symbol Recognition",
       "description": "Shows the set icon SVG. The answer is the set name.",

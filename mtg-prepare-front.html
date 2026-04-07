@@ -1,0 +1,126 @@
+<div class="card-container">
+    <img class="card-image">
+	  <div style="display: none;">{{cloze:Text}}</div>
+    {{#c1}}<canvas id="permanent" class="occlusion"></canvas>{{/c1}}
+    {{#c2}}<canvas id="spell" class="occlusion"></canvas>{{/c2}}
+</div>
+
+<script>
+
+var url = 'https://api.scryfall.com/cards/'+ "{{UUID}}" + '?format=json';
+
+
+fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        setCardImage(data);
+        setOcclusions(data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+
+function setOcclusions(data) {
+    const canvases = getCanvases();
+    const canvasContexts = getCanvasContexts(canvases);
+
+    setColor(canvases, canvasContexts, data);
+    setPermanentOcclusion(canvasContexts.permanent);
+    setSpellOcclusion(canvasContexts.spell);
+
+}
+
+function sortColorsByWUBRG(colors) {
+    const wubrgOrder = ['W', 'U', 'B', 'R', 'G'];
+    return colors.slice().sort((a, b) => {
+        return wubrgOrder.indexOf(a) - wubrgOrder.indexOf(b);
+    });
+}
+
+function getFillStyle(context, data) {
+    if (data.color_identity.length === 2) {
+        const sortedColors = sortColorsByWUBRG(data.color_identity);
+        const canvas = context.canvas;
+        const gradient = context.createLinearGradient(0, 0, canvas.width, 0);
+        gradient.addColorStop(0, getMtgColor(sortedColors[0]));
+        gradient.addColorStop(0.45, getMtgColor(sortedColors[0]));
+        gradient.addColorStop(0.55, getMtgColor(sortedColors[1]));
+        gradient.addColorStop(1, getMtgColor(sortedColors[1]));
+        return gradient;
+    } else {
+        return getBackgroundColor(data.color_identity);
+    }
+}
+
+function setColor(canvases, contexts, data) {
+    for (let key in contexts) {
+        if (canvases.hasOwnProperty(key) && contexts[key]) {
+            contexts[key].fillStyle = getFillStyle(contexts[key], data);
+        }
+    }
+}
+
+function setPermanentOcclusion(context) {
+    if (context) {
+        context.fillRect(21, 94, 126, 44);
+    }
+}
+
+function setSpellOcclusion(context) {
+    if (context) {
+        context.fillRect(152, 109, 126, 29);
+    }
+}
+
+function getCanvases() {
+    return {
+        "permanent": document.getElementById('permanent'),
+        "spell": document.getElementById('spell')
+    }
+}
+
+function getCanvasContexts(canvases) {
+    return {
+        "permanent": canvases.permanent ? canvases.permanent.getContext('2d') : '',
+        "spell": canvases.spell ? canvases.spell.getContext('2d') : ''
+    }
+}
+
+function setCardImage(data) {
+    document.querySelector('.card-image').src = data.image_uris.normal;
+}
+
+function getBackgroundColor(colors) {
+    if (colors.length <= 1) {
+        return getMtgColor(colors[0]);
+    } else {
+        return 'rgb(218, 165, 32)';
+    }
+}
+
+function getMtgColor(color_identity) {
+    let background_color;
+
+    switch (color_identity) {
+        case 'W':
+            background_color = 'rgb(248, 231, 185)'; // Light yellow
+            break;
+        case 'U':
+            background_color = 'rgb(179, 206, 234)'; // Light blue
+            break;
+        case 'B':
+            background_color = 'rgb(166, 159, 157)'; // Dark gray
+            break;
+        case 'R':
+            background_color = 'rgb(235, 159, 130)'; // Light red
+            break;
+        case 'G':
+            background_color = 'rgb(166, 211, 182)'; // Light green
+            break;
+        default:
+            background_color = 'rgb(201, 194, 186)'; // Light brown (for colorless/artifacts)
+    }
+
+    return background_color;
+}
+</script>
